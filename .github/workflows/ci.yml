@@ -1,0 +1,39 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  sigma:
+    runs-on: ubuntu-latest
+    name: Validate Sigma rules
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PyYAML
+        run: python3 -m pip install --quiet pyyaml
+      - name: Structural validation
+        run: |
+          python3 - <<'PY'
+          import glob, yaml, uuid, sys
+          req = ["title", "id", "description", "logsource", "detection", "level"]
+          bad = 0; ids = {}
+          rules = sorted(glob.glob('rules/**/*.yml', recursive=True))
+          for f in rules:
+              try:
+                  d = yaml.safe_load(open(f))
+              except Exception as e:
+                  print("YAML FAIL", f, e); bad += 1; continue
+              miss = [k for k in req if k not in d]
+              if miss: print(f"{f}: missing {miss}"); bad += 1
+              try: uuid.UUID(str(d.get("id")))
+              except Exception: print(f"{f}: invalid id"); bad += 1
+              if "condition" not in (d.get("detection") or {}):
+                  print(f"{f}: no detection.condition"); bad += 1
+              ids.setdefault(d.get("id"), []).append(f)
+          for k, v in ids.items():
+              if len(v) > 1: print("duplicate id", k, v); bad += 1
+          print(f"rules checked: {len(rules)}  problems: {bad}")
+          sys.exit(1 if bad else 0)
+          PY

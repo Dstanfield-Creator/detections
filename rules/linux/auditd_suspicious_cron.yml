@@ -1,0 +1,34 @@
+title: Modification of Cron Files or Directories
+id: 90370b5b-cf7e-4d53-b893-a89285a6bd52
+status: experimental
+description: |
+  Detects writes to system cron locations recorded by the Linux audit daemon
+  (PATH records). Attackers add cron entries for scheduled execution and
+  persistence. Lab-scoped: requires an auditd watch on the cron paths, for
+  example "-w /etc/cron.d/ -p wa -k cron_change".
+references:
+  - https://attack.mitre.org/techniques/T1053/003/
+  - https://man7.org/linux/man-pages/man5/crontab.5.html
+author: Danny Stanfield
+date: 2026-10-08
+tags:
+  - attack.persistence
+  - attack.execution
+  - attack.t1053.003
+logsource:
+  product: linux
+  service: auditd
+detection:
+  selection:
+    type: 'PATH'
+    name|contains:
+      - '/etc/cron.d/'
+      - '/etc/cron.daily/'
+      - '/etc/cron.hourly/'
+      - '/etc/crontab'
+      - '/var/spool/cron/'
+  condition: selection
+falsepositives:
+  - Package managers installing or updating scheduled jobs
+  - Administrators editing cron entries by hand
+level: medium

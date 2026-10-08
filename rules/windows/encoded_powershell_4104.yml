@@ -1,0 +1,34 @@
+title: Encoded or Obfuscated PowerShell Script Block
+id: c76e49f2-a43d-460e-8dbe-5355e091afdc
+status: experimental
+description: |
+  Detects PowerShell script block logging (event ID 4104) containing encoded
+  command flags or base64 decode routines frequently used to hide payloads.
+  Lab-scoped: requires Module and Script Block Logging to be enabled via Group
+  Policy on the monitored Windows host.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+  - https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_windows
+author: Danny Stanfield
+date: 2026-10-08
+tags:
+  - attack.execution
+  - attack.t1059.001
+logsource:
+  product: windows
+  category: ps_script
+  definition: 'Script block logging must be enabled (EventID 4104)'
+detection:
+  selection:
+    ScriptBlockText|contains:
+      - '-EncodedCommand'
+      - ' -enc '
+      - '::FromBase64String('
+      - 'FromBase64String'
+      - '-w hidden'
+      - '-nop -'
+  condition: selection
+falsepositives:
+  - Administrative automation that legitimately uses encoded commands
+  - Vendor management tooling
+level: high

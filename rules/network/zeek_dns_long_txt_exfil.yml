@@ -1,0 +1,33 @@
+title: Long DNS TXT Query Suggesting Tunneling or Exfiltration
+id: 79b5b00f-7cd1-4c9d-82bc-c6053e5176c3
+status: experimental
+description: |
+  Detects unusually long DNS query names associated with TXT or NULL record
+  lookups in Zeek dns.log. Encoded data in long subdomain labels is a hallmark
+  of DNS tunneling and low-and-slow exfiltration. Lab-scoped: tune the length
+  and allowlist known telemetry or CDN domains.
+references:
+  - https://attack.mitre.org/techniques/T1048/
+  - https://attack.mitre.org/techniques/T1071/004/
+  - https://docs.zeek.org/en/master/logs/dns.html
+author: Danny Stanfield
+date: 2026-10-08
+tags:
+  - attack.exfiltration
+  - attack.command-and-control
+  - attack.t1048
+  - attack.t1071.004
+logsource:
+  product: zeek
+  service: dns
+detection:
+  selection:
+    qtype_name:
+      - 'TXT'
+      - 'NULL'
+    query|re: '^[A-Za-z0-9+/=._-]{50,}\.'
+  condition: selection
+falsepositives:
+  - Antivirus and reputation services that encode lookups in long subdomains
+  - Some content delivery networks and email authentication records
+level: medium

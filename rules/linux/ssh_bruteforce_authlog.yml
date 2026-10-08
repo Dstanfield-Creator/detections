@@ -1,0 +1,30 @@
+title: SSH Failed Password Attempts in Auth Log
+id: 57c96265-63ef-4115-959d-906fcb238aa1
+status: experimental
+description: |
+  Detects failed SSH password authentications written by sshd to the Linux auth
+  log. On its own each line is benign; a burst from one source address is a
+  brute force indicator and should be correlated with a count threshold at the
+  SIEM (for example more than 10 failures in 5 minutes from one source).
+  Lab-scoped keyword match against the system auth log.
+references:
+  - https://attack.mitre.org/techniques/T1110/
+  - https://man7.org/linux/man-pages/man8/sshd.8.html
+author: Danny Stanfield
+date: 2026-10-08
+tags:
+  - attack.credential-access
+  - attack.t1110
+logsource:
+  product: linux
+  service: sshd
+detection:
+  keywords:
+    - 'Failed password for'
+    - 'Failed password for invalid user'
+    - 'authentication failure'
+  condition: keywords
+falsepositives:
+  - A legitimate user mistyping a password
+  - Automation configured with stale credentials
+level: medium

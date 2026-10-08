@@ -1,0 +1,27 @@
+title: Nikto Web Scanner User Agent
+id: 4e5fa020-1139-40a3-9a3e-577578611868
+status: experimental
+description: |
+  Detects requests whose User-Agent header identifies the Nikto web server
+  scanner. Reconnaissance scanning against a lab web application. Lab-scoped:
+  authorised scanning from the analyst workstation should be allowlisted by
+  source address.
+references:
+  - https://attack.mitre.org/techniques/T1595/
+  - https://github.com/sullo/nikto
+author: Danny Stanfield
+date: 2026-10-08
+tags:
+  - attack.reconnaissance
+  - attack.t1595
+logsource:
+  category: webserver
+detection:
+  selection:
+    c-useragent|contains:
+      - 'Nikto'
+      - '(Nikto/'
+  condition: selection
+falsepositives:
+  - Authorised vulnerability scanning scheduled by the blue team
+level: medium

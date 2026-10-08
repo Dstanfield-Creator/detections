@@ -1,0 +1,29 @@
+title: RDP Brute Force - Many Failed Logons From One Source
+id: f7db43bb-c75c-4c85-ad0c-8695476e71cc
+status: experimental
+description: |
+  Detects a high volume of failed interactive logons over RDP (Security event
+  ID 4625 with LogonType 10) originating from a single source address within a
+  short window, indicating password guessing. Lab-scoped: threshold tuned for a
+  quiet home lab and should be raised for busier environments.
+references:
+  - https://attack.mitre.org/techniques/T1110/
+  - https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625
+author: Danny Stanfield
+date: 2026-10-08
+tags:
+  - attack.credential-access
+  - attack.t1110
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4625
+    LogonType: 10
+  timeframe: 5m
+  condition: selection | count() by IpAddress > 10
+falsepositives:
+  - A user repeatedly entering a wrong password after a credential rotation
+  - Misconfigured RDP clients or automation retrying stale credentials
+level: medium

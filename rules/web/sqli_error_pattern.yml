@@ -1,0 +1,34 @@
+title: SQL Injection Patterns in Web Request URI
+id: f42ec08e-cfbd-48ee-b3c7-173558240d18
+status: experimental
+description: |
+  Detects common SQL injection payload fragments in the request URI query
+  string recorded in web server access logs. Targets exploitation attempts
+  against a public-facing lab application. Lab-scoped: expect false positives
+  from search terms and legitimate SQL keywords in URLs, so review in context.
+references:
+  - https://attack.mitre.org/techniques/T1190/
+  - https://owasp.org/www-community/attacks/SQL_Injection
+author: Danny Stanfield
+date: 2026-10-08
+tags:
+  - attack.initial-access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'UNION SELECT'
+      - 'union+select'
+      - ' OR 1=1'
+      - "'OR'1'='1"
+      - 'information_schema'
+      - 'SLEEP('
+      - 'BENCHMARK('
+      - 'xp_cmdshell'
+  condition: selection
+falsepositives:
+  - Legitimate search queries that contain SQL keywords
+  - Security awareness testing and authorised web application scans
+level: high
