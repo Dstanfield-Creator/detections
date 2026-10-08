@@ -96,7 +96,11 @@ Rules are validated locally before they are committed, and again in CI:
   executes the mapped ATT&CK technique in the isolated lab so the detection can
   be proven end to end before deployment.
 
-Full steps are in [docs/testing.md](docs/testing.md).
+Full steps are in [docs/testing.md](./docs/testing.md).
+
+The Windows rules assume the audit policy, Sysmon configuration and forwarding described in
+[docs/windows-ad-logging-baseline-for-detection.md](./docs/windows-ad-logging-baseline-for-detection.md),
+which also maps each attack technique to the events it produces.
 
 ## ATT&CK Coverage
 
